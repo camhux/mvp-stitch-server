@@ -28,12 +28,13 @@ Posts.on("add", function(post) {
   var sentences = post.text.split(/[\.\n]/);
 
   var fragments = sentences.map(function(sentence) {
+    var words = sentence.split(" ")
     return {
-      frontsubstr: sentence.slice(0, 4).toJSON(),
-      backsubstr: sentence.slice(-4).toJSON(),
+      frontsubstr: words.slice(0, 4).toJSON(),
+      backsubstr: words.slice(-4).toJSON(),
       text: sentence,
       post_id: post.id
-    }
+    };
   });
 
   Fragments.add(fragments);
@@ -73,7 +74,9 @@ function insertPost(data) {
 }
 
 function getRecentFragments() {
+  Posts.fetch().then(function(posts) {
 
+  })
 }
 
 module.exports = {
