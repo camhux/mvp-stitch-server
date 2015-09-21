@@ -17,6 +17,7 @@ apiRoutes.route("/text")
   })
   .post(function(req, res) {
     // TODO: addition of text w/ identifier and message into database
+    db.insertPost(req.body);
     console.log(req.body);
   });
 

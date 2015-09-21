@@ -3,9 +3,9 @@ var knex = require("knex")({
   connection: require("./dbconfig")
 });
 
-var db = module.exports = require("bookshelf")(knex);
+var bookshelf = module.exports = require("bookshelf")(knex);
 
-db.clearDb = function() {
+bookshelf.clearDb = function() {
   this.knex.dropTableIfExists("posts");
   this.knex.dropTableIfExists("fragments");
   this.knex.dropTableIfExists("users");
@@ -14,9 +14,9 @@ db.clearDb = function() {
 // Post Schema
   // Posts come in as text + user token
   // Text must be transformed into fragments using fragment schema
-db.knex.schema.hasTable("posts").then(function(table) {
+bookshelf.knex.schema.hasTable("posts").then(function(table) {
   if (!table) {
-    return db.knex.schema.createTable("posts", function(post) {
+    return bookshelf.knex.schema.createTable("posts", function(post) {
       post.uuid("id").primary();
       post.text("text").notNullable();
       post.uuid("user_id").notNullable().references("id").inTable("users");
@@ -28,9 +28,9 @@ db.knex.schema.hasTable("posts").then(function(table) {
 // Fragment Schema
   // Contains raw text of each fragment
   // Graph of word chains -- or is a simple substring match enough? How to make relationship efficient?
-db.knex.schema.hasTable("fragments").then(function(table) {
+bookshelf.knex.schema.hasTable("fragments").then(function(table) {
   if (!table) {
-    return db.knex.schema.createTable("fragments", function(fragment) {
+    return bookshelf.knex.schema.createTable("fragments", function(fragment) {
       fragment.uuid("id").primary();
       fragment.uuid("post_id").notNullable().references("id").inTable("posts");
       fragment.text("text").notNullable();
@@ -43,9 +43,9 @@ db.knex.schema.hasTable("fragments").then(function(table) {
 
 // User Schema
   // Simple id-token association, for use as foreign key
-db.knex.schema.hasTable("users").then(function(table) {
+bookshelf.knex.schema.hasTable("users").then(function(table) {
   if (!table) {
-    return db.knex.schema.createTable("users", function(user) {
+    return bookshelf.knex.schema.createTable("users", function(user) {
       user.uuid("id").primary();
       user.string("name").notNullable();
     });

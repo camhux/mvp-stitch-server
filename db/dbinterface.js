@@ -1,6 +1,6 @@
-var db = require("./db");
+var bookshelf = require("./bookshelf");
 
-var Post = db.Model.extend({
+var Post = bookshelf.Model.extend({
   tableName: "posts",
   fragments: function() {
     return this.hasMany(Fragment);
@@ -8,15 +8,18 @@ var Post = db.Model.extend({
 });
 
 // Single authoritative collection
-var Posts = new db.Collection;
+var Posts = new bookshelf.Collection;
 Posts.model = Post;
 
-var Fragment = db.Model.extend({
-  tableName: "fragments"
+var Fragment = bookshelf.Model.extend({
+  tableName: "fragments",
+  post: function() {
+    return this.belongsTo(Post);
+  }
 });
 
 // Single authoritative collection
-var Fragments = new db.Collection;
+var Fragments = new bookshelf.Collection;
 Fragments.model = Fragment;
 
 // Each time a post is added, split it into sentences and generate fragments
@@ -36,7 +39,7 @@ Posts.on("add", function(post) {
   Fragments.add(fragments);
 });
 
-var User = db.Model.extend({
+var User = bookshelf.Model.extend({
   tableName: "users",
   posts: function() {
     return this.hasMany(Post);
@@ -44,24 +47,17 @@ var User = db.Model.extend({
 });
 
 // Single authoritative collection
-var Users = new db.Collection;
+var Users = new bookshelf.Collection;
 Users.model = User;
-
-function insertUser(data) {
-  return new User({name: data.username}).fetch()
-    .then(function(user) {
-      if (user) {
-        throw new Error("User token already exists in database")
-      }
-      Users.create({name: data.username});
-    });
-}
 
 function insertPost(data) {
   return new User({name: data.username}).fetch()
     .then(function(user) {
       if (!user) {
-        throw new Error("User doesn't exist in database!");
+        return Users.create({name: data.username})
+          .then(function(user) {
+            return user.id;
+          });
       } else {
         return user.id;
       }
@@ -78,4 +74,9 @@ function insertPost(data) {
 
 function getRecentFragments() {
 
+}
+
+module.exports = {
+  insertPost,
+  getRecentFragments
 }
