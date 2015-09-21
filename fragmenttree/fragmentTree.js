@@ -12,11 +12,11 @@ function FragmentTree(fragments) {
 
     fragment.frontsubstr.reduce(function(parent, word) {
 
-      var node = createOrAccessChild(parent.children, word);
+      var node = createOrAccessNode(parent.children, word);
 
       node.fragmentRefs.push(fragment.id);
 
-      return node.children;
+      return node;
 
     }, rootNode);
 
@@ -38,13 +38,4 @@ function createOrAccessNode(object, word) {
   return object[word];
 }
 
-
-function prefixTrieFromFragments(fragments) {
-  var rootNode = {word: null, children: {}, fragmentRefs: []};
-
-  return fragments.reduce(function(tree, fragment) {
-    var substringArray = fragment.frontsubstr;
-    
-  }, rootNode);
-  
-}
+module.exports = FragmentTree;
