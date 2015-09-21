@@ -28,8 +28,9 @@ db.knex.schema.hasTable("fragments").then(function(table) {
       fragment.uuid("id").primary();
       fragment.uuid("post_id").notNullable().references("id").inTable("posts");
       fragment.text("text").notNullable();
-      fragment.specificType("frontsubstr", "text[4]").notNullable();
-      fragment.specificType("backsubstr", "text[4]").notNullable();
+      // Two JSON arrays of length 4 for front and rear substring searches
+      fragment.json("frontsubstr").notNullable();
+      fragment.json("backsubstr").notNullable();
     });
   }
 })
@@ -40,7 +41,7 @@ db.knex.schema.hasTable("users").then(function(table) {
   if (!table) {
     return db.knex.schema.createTable("users", function(user) {
       user.uuid("id").primary();
-      user.text("name").notNullable();
+      user.string("name").notNullable();
     });
   }
 });
