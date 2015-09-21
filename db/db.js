@@ -5,6 +5,12 @@ var knex = require("knex")({
 
 var db = module.exports = require("bookshelf")(knex);
 
+db.clearDb = function() {
+  this.knex.dropTableIfExists("posts");
+  this.knex.dropTableIfExists("fragments");
+  this.knex.dropTableIfExists("users");
+}
+
 // Post Schema
   // Posts come in as text + user token
   // Text must be transformed into fragments using fragment schema
