@@ -1,0 +1,19 @@
+{
+  "name": "eurygloss",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camhux/2015-08-mvp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/camhux/2015-08-mvp/issues"
+  },
+  "homepage": "https://github.com/camhux/2015-08-mvp#readme"
+}
