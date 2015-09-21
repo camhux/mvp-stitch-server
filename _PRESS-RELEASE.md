@@ -16,20 +16,27 @@ Oh, and I also like to write press-releases in what I call "Oprah-speak" for mai
 Once the project moves into development, the press release can be used as a touchstone; a guiding light. The product team can ask themselves, "Are we building what is in the press release?" If they find they're spending time building things that aren't in the press release (overbuilding), they need to ask themselves why. This keeps product development focused on achieving the customer benefits and not building extraneous stuff that takes longer to build, takes resources to maintain, and doesn't provide real customer benefit (at least not enough to warrant inclusion in the press release).
  -->
  
-## Heading ##
-  > Name the product in a way the reader (i.e. your target customers) will understand.
+## Eurygloss ##
 
-## Sub-Heading ##
-  > Describe who the market for the product is and what benefit they get. One sentence only underneath the title.
+## Endless, seamless, anonymous text. ##
 
 ## Summary ##
-  > Give a summary of the product and the benefit. Assume the reader will not read anything else so make this paragraph good.
+Eurygloss is an anonymous social platform. Users submit text, and Eurygloss stitches together the submissions
+of different users to display a single tapestry of sentence fragments. From the front page containing this tapestry, 
+a viewer can click on any color-coded fragment of text to recover its original context within a single submission,
+and from there view other submissions by the same anonymous user.
 
 ## Problem ##
-  > Describe the problem your product solves.
+Social platforms today are generally organized into discrete, atomic identities and posts. Moving laterally
+amidst users and their submissions involves several steps, and recovering the larger context of a single post
+or thread of posts can be a frustrating process.
 
 ## Solution ##
-  > Describe how your product elegantly solves the problem.
+Eurygloss presents only a tapestry of portions of posts, instead of disjoint individual posts. Eurygloss
+additionally shifts the architecture of the social platform from a focus on the user profile to a focus
+on expression-at-large. When a user on Eurygloss submits a sentence, a paragraph, or a fragment, they can instantly
+sees their words woven into the front page of the site, mingled with the temporal context of the tapestry when they
+submitted.
 
 ## Quote from You ##
   > A quote from a spokesperson in your company.
