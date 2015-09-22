@@ -31,10 +31,10 @@ FragmentTree.prototype.search = function(fragment) {
   var words = fragment.backsubstr;
   var rootNode = this.root;
 
-  var result = (function reduceWordSet(node, words) {
+  var match = (function reduceWordSet(node, words) {
   
       if (words.length === 0) {
-        return getRandomElement(node.fragmentRefs);
+        return {ref: getRandomElement(node.fragmentRefs), words: []};
       }
   
       for (var i = 0; i < words.length; i++) {
@@ -43,11 +43,13 @@ FragmentTree.prototype.search = function(fragment) {
           return reduceWordSet(rootNode, words.slice(1));
         }
       }
-      return {ref: getRandomElement(node.fragmentRefs), matched: words};
+      return {ref: getRandomElement(node.fragmentRefs), words: words};
 
     })(rootNode, words);
 
-    return result;
+    match.fragment = this.fragHash[match.ref];
+
+    return match;
 };
 
 //// Node class ///////////////////

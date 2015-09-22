@@ -20,10 +20,13 @@ function generateFragments(post) {
   var fragments = sentences.map(function(sentence) {
     // TODO: make lazier
     var words = sentence.replace(/[^\w\s]/, "").split(" ");
+    var frontsubstr = words.slice(0, 4).map( word => word.toLowerCase() );
+    var backsubstr = words.slice(-4).map( word => word.toLowerCase() );
+    var trimmed = words.slice((frontsubstr.length), -(backsubstr.length)).join(" ");
     return {
-      frontsubstr: JSON.stringify(words.slice(0, 4).map( word => word.toLowerCase() )),
-      backsubstr: JSON.stringify(words.slice(-4).map( word => word.toLowerCase() )),
-      trimmed: words.slice(4, -4),
+      frontsubstr: JSON.stringify(frontsubstr),
+      backsubstr: JSON.stringify(backsubstr),
+      trimmed: trimmed,
       raw: sentence,
       post_id: post.get("id"),
       id: uuid.v1()
@@ -92,22 +95,27 @@ function getAllFragments() {
 
 function stitchPosts(posts) {
   return getAllFragments().then(function(fragments) {
-    return stitchReduce(fragments.toArray());
-  })
-  .then(function(sequence){
-    return sequence.map( fragment => fragment.get("text") );
+    return sequenceFragments(fragments.toArray());
+  }).then(function(sequence) {
+    return stitchSequenceToText(sequence);
   });
+  // .then(function(sequence){
+  //   return sequence.map( fragment => fragment.get("text") );
+  // });
 
   //// stitching helpers //////////////////////
-  function stitchReduce(fragments, sequence) {
+  function sequenceFragments(fragments, sequence) {
+    // TODO: messy logic here
     if (sequence === undefined) {
       sequence = [];
-      sequence.push(pluckRandom(fragments));
+      if (fragments && fragments.length) {
+        sequence.push(pluckRandom(fragments));
+      }
     }
+
     if (fragments.length === 0) {
       return sequence;
     }
-    console.log(sequence);  
 
     var tree = new FragmentTree(fragments.map((fragment, i) => {
                                   fragment.attributes._index = i;
@@ -116,8 +124,32 @@ function stitchPosts(posts) {
 
     var base = sequence[sequence.length - 1];
     var match = tree.search(base.attributes);
+    base.matchedWords = match.words;
     sequence.push(pluck(fragments, match._index));
-    return stitchReduce(fragments, sequence);
+    return sequenceFragments(fragments, sequence);
+  }
+
+  function stitchSequenceToText(sequence) {
+    console.log(sequence);
+    if (!sequence.length) return "";
+    return sequence.reduce(function(state, fragment) {
+      var fragText;
+      if (state.joinNext) {
+        fragText = fragment.frontsubstr.join(" ") + fragment.trimmed;
+      } else {
+        // TODO: find way to use raw here
+        fragText = fragment.frontsubstr.join(" ") + fragment.trimmed;
+      }
+      if (fragment.matchedWords.length === 0) {
+        fragText += fragment.backsubstr.join(" ");
+        state.joinNext = true;
+      } else {
+        fragText += fragment.matchedWords.join(" ")
+        state.joinNext = false;
+      }
+      state.text += fragText;
+      return state;
+    }, {text: "", joinNext: false}).text;
   }
 
   function pluck(array, index) {
@@ -129,7 +161,6 @@ function stitchPosts(posts) {
   }
 
   function pluckRandom(array) {
-    if (!array.length) return null;
     var randomIx = Math.floor(Math.random() * array.length);
     return pluck(array, randomIx);
   }
