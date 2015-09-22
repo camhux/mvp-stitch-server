@@ -10,18 +10,23 @@ app.use(morgan("dev"));
 
 var apiRoutes = express.Router();
 
-apiRoutes.route("/text")
+apiRoutes.route("/posts")
   .get(function(req, res) {
     // TODO: database digest of current text state
-    res.json(); 
+    db.getAllPosts().then(function(posts) {
+      res.json(posts); 
+    });
   })
   .post(function(req, res) {
     // TODO: addition of text w/ identifier and message into database
-    db.insertPost(req.body);
+    db.insertPost(req.body)
+      .then(function() {
+        res.status(201).end();
+      });
     console.log(req.body);
   });
 
-apiRoutes.route("/text/:fragmentId")
+apiRoutes.route("/posts/:fragmentId")
   .get(function(req, res) {
     // TODO: use identifier of fragment to recover original context from db
     res.json();

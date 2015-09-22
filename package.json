@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "devstart": "PGSSLMODE=require NODE_ENV=development node server.js",
     "start": "PGSSLMODE=require node server.js"
   },
   "repository": {
@@ -25,6 +26,7 @@
     "express-session": "^1.11.3",
     "knex": "^0.8.6",
     "morgan": "^1.6.1",
+    "node-uuid": "^1.4.3",
     "pg": "^4.4.2"
   }
 }

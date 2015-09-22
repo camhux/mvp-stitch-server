@@ -1,4 +1,5 @@
-var bookshelf = require("./bookshelf");
+var bookshelf = require("./db");
+var uuid = require("node-uuid");
 
 var Post = bookshelf.Model.extend({
   tableName: "posts",
@@ -55,7 +56,7 @@ function insertPost(data) {
   return new User({name: data.username}).fetch()
     .then(function(user) {
       if (!user) {
-        return Users.create({name: data.username})
+        return Users.create({name: data.username, id: uuid.v1()}, {method: "insert"})
           .then(function(user) {
             return user.id;
           });
@@ -65,7 +66,7 @@ function insertPost(data) {
     })
     .then(function(userid) {
       // TODO: Generate fragments
-      return Posts.create({text: data.text, user_id: userid})
+      return Posts.create({text: data.text, user_id: userid, id: uuid.v1(), created_at: new Date().toISOString()}, {method: "insert"});
     })
     .catch(function(err) {
       console.error("Error inserting post: ", err);
@@ -73,13 +74,11 @@ function insertPost(data) {
     });
 }
 
-function getRecentFragments() {
-  Posts.fetch().then(function(posts) {
-
-  })
+function getAllPosts() {
+  return Posts.fetch();
 }
 
 module.exports = {
   insertPost,
-  getRecentFragments
+  getAllPosts
 }
