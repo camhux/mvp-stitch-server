@@ -95,7 +95,7 @@ function getAllFragments() {
 
 function stitchPosts(posts) {
   return getAllFragments().then(function(fragments) {
-    return sequenceFragments(fragments.toArray());
+    return sequenceFragments(fragments.toArray().slice(0, 15));
   }).then(function(sequence) {
     return stitchSequenceToText(sequence);
   });
@@ -114,6 +114,7 @@ function stitchPosts(posts) {
     }
 
     if (fragments.length === 0) {
+      sequence[sequence.length - 1].set("matchedWords", []);
       return sequence;
     }
 
@@ -124,27 +125,29 @@ function stitchPosts(posts) {
 
     var base = sequence[sequence.length - 1];
     var match = tree.search(base.attributes);
-    base.matchedWords = match.words;
-    sequence.push(pluck(fragments, match._index));
+    base.set("matchedWords", match.words);
+    sequence.push(pluck(fragments, match.fragment._index));
     return sequenceFragments(fragments, sequence);
   }
 
   function stitchSequenceToText(sequence) {
-    console.log(sequence);
+    // TODO: cleanup
     if (!sequence.length) return "";
     return sequence.reduce(function(state, fragment) {
+      var attrs = fragment.attributes;
+      console.log(attrs);
       var fragText;
       if (state.joinNext) {
-        fragText = fragment.frontsubstr.join(" ") + fragment.trimmed;
+        fragText = attrs.frontsubstr.join(" ") + attrs.trimmed;
       } else {
         // TODO: find way to use raw here
-        fragText = fragment.frontsubstr.join(" ") + fragment.trimmed;
+        fragText = attrs.frontsubstr.join(" ") + attrs.trimmed;
       }
-      if (fragment.matchedWords.length === 0) {
-        fragText += fragment.backsubstr.join(" ");
+      if (attrs.matchedWords.length === 0) {
+        fragText += attrs.backsubstr.join(" ");
         state.joinNext = true;
       } else {
-        fragText += fragment.matchedWords.join(" ")
+        fragText += attrs.matchedWords.join(" ")
         state.joinNext = false;
       }
       state.text += fragText;
