@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var FragmentTree = require(__dirname + "/fragmentTree.js");
+var FragmentTree = require(__dirname + "/fragmentTree");
 
 function FragmentMock(words) {
   this.frontsubstr = words.slice(0, 4);
@@ -58,13 +58,14 @@ describe("Fragment tree", function() {
       expect(tree.fragHash[child.fragmentRefs[0]]).to.be.an.instanceOf(FragmentMock);
     });
 
-    it("should have a method called retrieve", function() {
-      expect(tree.retrieve).to.be.a("function");
+    it("should have a method called search", function() {
+      expect(tree.search).to.be.a("function");
     });
 
-    it("should use the argument to retrieve to find an overlapping fragment", function() {
+    it("should use the argument to search to find an overlapping fragment", function() {
       var backsubstr = ["he", "can", "barely", "deal"];
-      var match = tree.retrieve(backsubstr);
+      var fragment = {backsubstr: backsubstr};
+      var match = tree.search(fragment);
       expect(match).to.be.an.instanceOf(FragmentMock);
     });
 
