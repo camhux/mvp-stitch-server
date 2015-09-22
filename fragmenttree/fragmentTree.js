@@ -31,7 +31,7 @@ FragmentTree.prototype.search = function(fragment) {
   var words = fragment.backsubstr;
   var rootNode = this.root;
 
-  return (function reduceWordSet(node, words) {
+  var ref = (function reduceWordSet(node, words) {
   
       if (words.length === 0) {
         return getRandomElement(node.fragmentRefs);
@@ -42,9 +42,12 @@ FragmentTree.prototype.search = function(fragment) {
         if (!node) {
           return reduceWordSet(rootNode, words.slice(1));
         }
-        
       }
+      return getRandomElement(node.fragmentRefs);
+
     })(rootNode, words);
+
+    return ref ? this.fragHash[ref] : null;
 };
 
 //// Node class ///////////////////

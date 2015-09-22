@@ -67,6 +67,7 @@ describe("Fragment tree", function() {
       var fragment = {backsubstr: backsubstr};
       var match = tree.search(fragment);
       expect(match).to.be.an.instanceOf(FragmentMock);
+      expect(match.frontsubstr).to.deep.equal(["can", "barely", "deal", "with"]);
     });
 
   }); // Retrieval
