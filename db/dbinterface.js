@@ -91,7 +91,7 @@ function getAllFragments() {
 
 function stitchPosts(posts) {
   return getAllFragments().then(function(fragments) {
-    return stitchReduce(fragments);
+    return stitchReduce(fragments.toArray());
   })
   .then(function(sequence){
     return sequence.map( fragment => fragment.get("text") );
@@ -106,6 +106,7 @@ function stitchPosts(posts) {
     if (fragments.length === 0) {
       return sequence;
     }
+    console.log(sequence);  
 
     var tree = new FragmentTree(fragments.map((fragment, i) => {
                                   fragment.attributes._index = i;
@@ -113,7 +114,6 @@ function stitchPosts(posts) {
                                 }));
 
     var base = sequence[sequence.length - 1];
-    console.log(base);
     var match = tree.search(base.attributes);
     sequence.push(pluck(fragments, match._index));
     return stitchReduce(fragments, sequence);
