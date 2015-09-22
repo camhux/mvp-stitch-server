@@ -63,7 +63,8 @@ function init() {
         return bookshelf.knex.schema.createTable("fragments", function(fragment) {
           fragment.uuid("id").primary();
           fragment.uuid("post_id").notNullable().references("id").inTable("posts");
-          fragment.text("text").notNullable();
+          fragment.text("raw").notNullable();
+          fragment.text("trimmed").notNullable();
           // Two JSON arrays of length 4 for front and rear substring searches
           fragment.json("frontsubstr").notNullable();
           fragment.json("backsubstr").notNullable();

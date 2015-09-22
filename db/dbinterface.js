@@ -19,11 +19,12 @@ function generateFragments(post) {
 
   var fragments = sentences.map(function(sentence) {
     // TODO: make lazier
-    var words = sentence.toLowerCase().replace(/[^\w\s]/, "").split(" ");
+    var words = sentence.replace(/[^\w\s]/, "").split(" ");
     return {
-      frontsubstr: JSON.stringify(words.slice(0, 4)),
-      backsubstr: JSON.stringify(words.slice(-4)),
-      text: sentence,
+      frontsubstr: JSON.stringify(words.slice(0, 4).map( word => word.toLowerCase() )),
+      backsubstr: JSON.stringify(words.slice(-4).map( word => word.toLowerCase() )),
+      trimmed: words.slice(4, -4),
+      raw: sentence,
       post_id: post.get("id"),
       id: uuid.v1()
     };
