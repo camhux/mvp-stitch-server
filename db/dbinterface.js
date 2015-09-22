@@ -114,7 +114,7 @@ function stitchPosts(posts) {
     }
 
     if (fragments.length === 0) {
-      sequence[sequence.length - 1].set("matchedWords", []);
+      sequence[sequence.length - 1].set("trimFromNext", 0);
       return sequence;
     }
 
@@ -125,7 +125,7 @@ function stitchPosts(posts) {
 
     var base = sequence[sequence.length - 1];
     var match = tree.search(base.attributes);
-    base.set("matchedWords", match.words);
+    base.set("trimFromNext", match.matchLen);
     sequence.push(pluck(fragments, match.fragment._index));
     return sequenceFragments(fragments, sequence);
   }
@@ -135,24 +135,16 @@ function stitchPosts(posts) {
     if (!sequence.length) return "";
     return sequence.reduce(function(state, fragment) {
       var attrs = fragment.attributes;
-      console.log(attrs);
-      var fragText;
-      if (state.joinNext) {
-        fragText = attrs.frontsubstr.join(" ") + attrs.trimmed;
-      } else {
-        // TODO: find way to use raw here
-        fragText = attrs.frontsubstr.join(" ") + attrs.trimmed;
-      }
-      if (attrs.matchedWords.length === 0) {
-        fragText += attrs.backsubstr.join(" ");
-        state.joinNext = true;
-      } else {
-        fragText += attrs.matchedWords.join(" ")
-        state.joinNext = false;
-      }
-      state.text += fragText;
+
+      var frontSlice = attrs.frontsubstr.slice(state.trimFromNext).join(" ");
+      var backSlice = attrs.backsubstr.slice(-(attrs.matchLen)).join(" ");
+
+      var fragText = [frontSlice, attrs.trimmed, backSlice].join(" ");
+      state.text += " " + fragText;
+      state.trimNext = attrs.matchLen;
+
       return state;
-    }, {text: "", joinNext: false}).text;
+    }, {text: "", trimFromNext: 0}).text;
   }
 
   function pluck(array, index) {

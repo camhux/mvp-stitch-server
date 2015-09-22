@@ -34,7 +34,7 @@ FragmentTree.prototype.search = function(fragment) {
   var match = (function reduceWordSet(node, words) {
   
       if (words.length === 0) {
-        return {ref: getRandomElement(node.fragmentRefs), words: []};
+        return {ref: getRandomElement(node.fragmentRefs), matchLen: 0};
       }
   
       for (var i = 0; i < words.length; i++) {
@@ -43,7 +43,7 @@ FragmentTree.prototype.search = function(fragment) {
           return reduceWordSet(rootNode, words.slice(1));
         }
       }
-      return {ref: getRandomElement(node.fragmentRefs), words: words};
+      return {ref: getRandomElement(node.fragmentRefs), matchLen: words.length};
 
     })(rootNode, words);
 
