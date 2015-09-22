@@ -26,7 +26,14 @@ apiRoutes.route("/posts")
     console.log(req.body);
   });
 
-apiRoutes.route("/posts/:fragmentId")
+apiRoutes.route("/fragments")
+  .get(function(req, res) {
+    db.getAllFragments().then(function(fragments) {
+      res.json(fragments);
+    });
+  });
+
+apiRoutes.route("/fragments/:fragmentId")
   .get(function(req, res) {
     // TODO: use identifier of fragment to recover original context from db
     res.json();

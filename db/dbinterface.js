@@ -1,12 +1,40 @@
 var bookshelf = require("./db");
 var uuid = require("node-uuid");
+var FragmentTree = require("../fragmenttree/fragmentTree.js");
 
 var Post = bookshelf.Model.extend({
   tableName: "posts",
+
+  initialize: function() {
+    this.on("created", generateFragments);
+  },
+
   fragments: function() {
     return this.hasMany(Fragment);
   }
 });
+
+function generateFragments(post) {
+
+  console.log("Adding fragments!!"); // <<<<<< DEV
+
+  var sentences = post.get("text").split(/[\.\n]\s?/);
+
+  var fragments = sentences.map(function(sentence) {
+    var words = sentence.split(" ");
+    return {
+      frontsubstr: JSON.stringify(words.slice(0, 4)),
+      backsubstr: JSON.stringify(words.slice(-4)),
+      text: sentence,
+      post_id: post.get("id"),
+      id: uuid.v1()
+    };
+  });
+
+  fragments.forEach(function(fragment) {
+    Fragments.create(fragment, {method: "insert"});
+  });
+}
 
 // Single authoritative collection
 var Posts = new bookshelf.Collection;
@@ -22,24 +50,6 @@ var Fragment = bookshelf.Model.extend({
 // Single authoritative collection
 var Fragments = new bookshelf.Collection;
 Fragments.model = Fragment;
-
-// Each time a post is added, split it into sentences and generate fragments
-Posts.on("add", function(post) {
-
-  var sentences = post.text.split(/[\.\n]/);
-
-  var fragments = sentences.map(function(sentence) {
-    var words = sentence.split(" ")
-    return {
-      frontsubstr: words.slice(0, 4).toJSON(),
-      backsubstr: words.slice(-4).toJSON(),
-      text: sentence,
-      post_id: post.id
-    };
-  });
-
-  Fragments.add(fragments);
-});
 
 var User = bookshelf.Model.extend({
   tableName: "users",
@@ -65,7 +75,6 @@ function insertPost(data) {
       }
     })
     .then(function(userid) {
-      // TODO: Generate fragments
       return Posts.create({text: data.text, user_id: userid, id: uuid.v1(), created_at: new Date().toISOString()}, {method: "insert"});
     })
     .catch(function(err) {
@@ -78,7 +87,24 @@ function getAllPosts() {
   return Posts.fetch();
 }
 
+function getAllFragments() {
+  return Fragments.fetch();
+}
+
+function stitchPosts(posts) {
+  return getAllFragments().then(function(fragments) {
+    console.log(fragments);
+    return new FragmentTree(fragments);
+  })
+  .then(function(tree) {
+    console.log(tree);
+    return tree;
+  });
+}
+
 module.exports = {
   insertPost,
-  getAllPosts
-}
+  getAllPosts,
+  stitchPosts,
+  getAllFragments
+};
