@@ -141,10 +141,19 @@ function stitchPosts(posts) {
     return sequence.reduce(function(state, fragment) {
       var attrs = fragment.attributes;
 
+      var trimmed = attrs.trimmed;
       var frontSlice = attrs.frontsubstr.slice(state.trimFromNext).join(" ");
       var backSlice = attrs.backsubstr.slice(-(attrs.matchLen)).join(" ");
 
-      var fragText = [frontSlice, attrs.trimmed, backSlice].join(" ");
+      var pieces;
+
+      if (!trimmed.length) {
+        pieces = [frontSlice, backSlice];
+      } else {
+        pieces = [frontSlice, trimmed, backSlice];
+      }
+
+      var fragText = pieces.join(" ");
 
       state.text += " " + fragText;
       state.trimFromNext = attrs.matchLen;
