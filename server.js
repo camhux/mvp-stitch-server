@@ -7,6 +7,11 @@ var app = express();
 
 app.use(bodyparser.json());
 app.use(morgan("dev"));
+app.use(express.static(__dirname + "client/build"));
+
+app.get("/", function(req, res) {
+  res.sendFile(__dirname + "client/index.html");
+});
 
 var apiRoutes = express.Router();
 

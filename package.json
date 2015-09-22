@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "devstart": "PGSSLMODE=require NODE_ENV=development node server.js",
-    "start": "PGSSLMODE=require node server.js"
+    "start": "PGSSLMODE=require node server.js",
+    "compile": "babel client/src --out-file client/build/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,9 @@
     "morgan": "^1.6.1",
     "node-uuid": "^1.4.3",
     "pg": "^4.4.2",
+    "react": "^0.13.3",
+    "react-redux": "^2.1.2",
+    "redux": "^3.0.0",
     "underscore": "^1.8.3"
   }
 }
