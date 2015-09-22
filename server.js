@@ -15,6 +15,13 @@ app.get("/", function(req, res) {
 
 var apiRoutes = express.Router();
 
+apiRoutes.route("/content")
+  .get(function(req, res) {
+    db.getContent().then(function(content) {
+      res.json(content);
+    });
+  });
+
 apiRoutes.route("/posts")
   .get(function(req, res) {
     // TODO: database digest of current text state

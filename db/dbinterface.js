@@ -11,7 +11,7 @@ var Post = bookshelf.Model.extend({
   },
 
   fragments: function() {
-    return this.hasMany(Fragment);
+    return this.hasMany(Fragment, "post_id");
   }
 });
 
@@ -95,7 +95,32 @@ function getAllPosts() {
 }
 
 function getAllFragments() {
-  return Fragments.fetch();
+  return Fragments.fetch().then(function(fragments) {
+    fragments.forEach(function(fragment) {
+      console.log(fragment.post());
+    });
+    return fragments;
+  });
+}
+
+function getContent() {
+  // return Posts.fetch()
+  //   .then(function(posts) {
+  //     posts = posts.toArray().slice(0, 12);
+  //     console.log(posts);
+  //     var fragments = [];
+  //     posts.forEach(function(post) {
+  //       // fragments = fragments.concat(post.fragments().toArray());
+  //       console.log(post.fragments());
+  //     });
+  //     // console.log(fragments);
+  //     fragments = sequenceContentFragments(fragments);
+  //     return {posts, fragments};
+  //   });
+  return Fragments.fetch().then(function(fragments) {
+    fragments = fragments.toArray().slice(0, 20);
+    return sequenceContentFragments(fragments);
+  });
 }
 
 function stitchPosts(posts) {
@@ -107,78 +132,111 @@ function stitchPosts(posts) {
   // .then(function(sequence){
   //   return sequence.map( fragment => fragment.get("text") );
   // });
+}
 
-  //// stitching helpers //////////////////////
-  function sequenceFragments(fragments, sequence) {
-    // TODO: messy logic here
-    if (sequence === undefined) {
-      sequence = [];
-      if (fragments && fragments.length) {
-        sequence.push(pluckRandom(fragments));
-      }
+//// stitching helpers //////////////////////
+function sequenceFragments(fragments, sequence) {
+  // TODO: messy logic here
+  if (sequence === undefined) {
+    sequence = [];
+    if (fragments && fragments.length) {
+      sequence.push(pluckRandom(fragments));
+    }
+  }
+
+  if (fragments.length === 0) {
+    sequence[sequence.length - 1].set("matchLen", 0);
+    return sequence;
+  }
+
+  var tree = new FragmentTree(fragments.map((fragment, i) => {
+                                fragment.attributes._index = i;
+                                return fragment.attributes;
+                              }));
+
+  var base = sequence[sequence.length - 1];
+  var match = tree.search(base.attributes);
+  base.set("matchLen", match.matchLen);
+  sequence.push(pluck(fragments, match.fragment._index));
+  return sequenceFragments(fragments, sequence);
+}
+
+function sequenceContentFragments(fragments) {
+  var sequence = sequenceFragments(fragments);
+  return sequence.reduce(function(state, fragment) {
+    var attrs = fragment.attributes;
+
+    var trimmed = attrs.trimmed;
+    var frontSlice = attrs.frontsubstr.slice(state.trimFromNext).join(" ");
+    var backSlice = attrs.backsubstr.join(" ");
+
+    var pieces;
+
+    if (!trimmed.length) {
+      pieces = [frontSlice, backSlice];
+    } else {
+      pieces = [frontSlice, trimmed, backSlice];
     }
 
-    if (fragments.length === 0) {
-      sequence[sequence.length - 1].set("matchLen", 0);
-      return sequence;
+    var fragText = pieces.join(" ");
+
+    state.fragments.push({
+      raw: attrs.raw,
+      inline: fragText,
+      id: attrs.id,
+      postId: attrs.post_id
+    });
+
+    state.trimFromNext = attrs.matchLen;
+
+    return state;
+  }, {fragments: [], trimFromNext: 0}).fragments;
+}
+
+function stitchSequenceToText(sequence) {
+  // TODO: cleanup
+  if (!sequence.length) return "";
+  return sequence.reduce(function(state, fragment) {
+    var attrs = fragment.attributes;
+
+    var trimmed = attrs.trimmed;
+    var frontSlice = attrs.frontsubstr.slice(state.trimFromNext).join(" ");
+    var backSlice = attrs.backsubstr.join(" ");
+
+    var pieces;
+
+    if (!trimmed.length) {
+      pieces = [frontSlice, backSlice];
+    } else {
+      pieces = [frontSlice, trimmed, backSlice];
     }
 
-    var tree = new FragmentTree(fragments.map((fragment, i) => {
-                                  fragment.attributes._index = i;
-                                  return fragment.attributes;
-                                }));
+    var fragText = pieces.join(" ");
 
-    var base = sequence[sequence.length - 1];
-    var match = tree.search(base.attributes);
-    base.set("matchLen", match.matchLen);
-    sequence.push(pluck(fragments, match.fragment._index));
-    return sequenceFragments(fragments, sequence);
-  }
+    state.text += " " + fragText;
+    state.trimFromNext = attrs.matchLen;
 
-  function stitchSequenceToText(sequence) {
-    // TODO: cleanup
-    if (!sequence.length) return "";
-    return sequence.reduce(function(state, fragment) {
-      var attrs = fragment.attributes;
+    return state;
+  }, {text: "", trimFromNext: 0}).text;
+}
 
-      var trimmed = attrs.trimmed;
-      var frontSlice = attrs.frontsubstr.slice(state.trimFromNext).join(" ");
-      var backSlice = attrs.backsubstr.join(" ");
+function pluck(array, index) {
+  var len = array.length;
+  var temp = array[index];
+  array[index] = array[len - 1];
+  array[len - 1] = temp;
+  return array.pop();
+}
 
-      var pieces;
-
-      if (!trimmed.length) {
-        pieces = [frontSlice, backSlice];
-      } else {
-        pieces = [frontSlice, trimmed, backSlice];
-      }
-
-      var fragText = pieces.join(" ");
-
-      state.text += " " + fragText;
-      state.trimFromNext = attrs.matchLen;
-
-      return state;
-    }, {text: "", trimFromNext: 0}).text;
-  }
-
-  function pluck(array, index) {
-    var len = array.length;
-    var temp = array[index];
-    array[index] = array[len - 1];
-    array[len - 1] = temp;
-    return array.pop();
-  }
-
-  function pluckRandom(array) {
-    var randomIx = Math.floor(Math.random() * array.length);
-    return pluck(array, randomIx);
-  }
+function pluckRandom(array) {
+  var randomIx = Math.floor(Math.random() * array.length);
+  return pluck(array, randomIx);
 }
 
 module.exports = {
   insertPost,
   getAllPosts,
   stitchPosts,
-  getAllFragments
+  getAllFragments,
+  getContent
 };

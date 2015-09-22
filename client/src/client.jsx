@@ -6,7 +6,7 @@ import App from "./components/App"
 
 var container = document.getElementById("container");
 
-var getPostsFromServer = function() {
+var getTextFromServer = function() {
   return new Promise(function(resolve, reject) {
     var request = new XMLHttpRequest();
     request.addEventListener(function() {
@@ -16,17 +16,17 @@ var getPostsFromServer = function() {
   });
 };
 
-var getPostFromServer = function(postId) {
-  return new Promise(function(resolve, reject) {
-    var request = new XMLHttpRequest();
-    request.addEventListener(function() {
-      resolve(this.response);
-    });
-    response.open("GET", "/api/content/" + postId)
-  });
-}
+// var getPostFromServer = function(postId) {
+//   return new Promise(function(resolve, reject) {
+//     var request = new XMLHttpRequest();
+//     request.addEventListener(function() {
+//       resolve(this.response);
+//     });
+//     response.open("GET", "/api/content/" + postId)
+//   });
+// }
 
-getPostsFromServer.then(function(data) {
+getTextFromServer.then(function(data) {
   React.render(
     <App content={ data } />,
     container
