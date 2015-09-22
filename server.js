@@ -33,6 +33,13 @@ apiRoutes.route("/fragments")
     });
   });
 
+apiRoutes.route("/fragments/stitched")
+  .get(function(req, res) {
+    db.stitchPosts().then(function(tree) {
+      res.json(tree);
+    });
+  });
+
 apiRoutes.route("/fragments/:fragmentId")
   .get(function(req, res) {
     // TODO: use identifier of fragment to recover original context from db

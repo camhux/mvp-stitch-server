@@ -16,9 +16,7 @@ var Post = bookshelf.Model.extend({
 
 function generateFragments(post) {
 
-  console.log("Adding fragments!!"); // <<<<<< DEV
-
-  var sentences = post.get("text").split(/[\.\n]\s?/);
+  var sentences = post.get("text").split(/[\.\n]\s/);
 
   var fragments = sentences.map(function(sentence) {
     var words = sentence.split(" ");
@@ -94,7 +92,7 @@ function getAllFragments() {
 function stitchPosts(posts) {
   return getAllFragments().then(function(fragments) {
     console.log(fragments);
-    return new FragmentTree(fragments);
+    return new FragmentTree(fragments.map( fragment => fragment.attributes ));
   })
   .then(function(tree) {
     console.log(tree);
