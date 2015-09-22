@@ -143,7 +143,7 @@ function stitchPosts(posts) {
 
       var trimmed = attrs.trimmed;
       var frontSlice = attrs.frontsubstr.slice(state.trimFromNext).join(" ");
-      var backSlice = attrs.backsubstr.slice(-(attrs.matchLen)).join(" ");
+      var backSlice = attrs.backsubstr.join(" ");
 
       var pieces;
 
