@@ -15,11 +15,11 @@ var Post = bookshelf.Model.extend({
 });
 
 function generateFragments(post) {
-  // TODO: strip punctuation marks from fragment search arrays
   var sentences = post.get("text").split(/[\.\n]\s/);
 
   var fragments = sentences.map(function(sentence) {
-    var words = sentence.split(" ");
+    // TODO: make lazier
+    var words = sentence.toLowerCase().replace(/[^\w\s]/, "").split(" ");
     return {
       frontsubstr: JSON.stringify(words.slice(0, 4)),
       backsubstr: JSON.stringify(words.slice(-4)),
