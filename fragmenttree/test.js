@@ -70,6 +70,12 @@ describe("Fragment tree", function() {
       expect(match.frontsubstr).to.deep.equal(["can", "barely", "deal", "with"]);
     });
 
+    it("should return a random fragment if there's no possible match", function() {
+      var fragment = {backsubstr: ["what", "the", "hayell"]};
+      var match = tree.search(fragment);
+      expect(match).to.be.an.instanceOf(FragmentMock);
+    });
+
   }); // Retrieval
 
 }); // FragmentTree
