@@ -15,7 +15,7 @@ var Post = bookshelf.Model.extend({
 });
 
 function generateFragments(post) {
-
+  // TODO: strip punctuation marks from fragment search arrays
   var sentences = post.get("text").split(/[\.\n]\s/);
 
   var fragments = sentences.map(function(sentence) {
@@ -35,7 +35,7 @@ function generateFragments(post) {
 }
 
 // Single authoritative collection
-var Posts = new bookshelf.Collection;
+var Posts = new bookshelf.Collection();
 Posts.model = Post;
 
 var Fragment = bookshelf.Model.extend({
@@ -46,7 +46,7 @@ var Fragment = bookshelf.Model.extend({
 });
 
 // Single authoritative collection
-var Fragments = new bookshelf.Collection;
+var Fragments = new bookshelf.Collection();
 Fragments.model = Fragment;
 
 var User = bookshelf.Model.extend({
@@ -57,7 +57,7 @@ var User = bookshelf.Model.extend({
 });
 
 // Single authoritative collection
-var Users = new bookshelf.Collection;
+var Users = new bookshelf.Collection();
 Users.model = User;
 
 function insertPost(data) {
@@ -91,13 +91,47 @@ function getAllFragments() {
 
 function stitchPosts(posts) {
   return getAllFragments().then(function(fragments) {
-    console.log(fragments);
-    return new FragmentTree(fragments.map( fragment => fragment.attributes ));
+    return stitchReduce(fragments);
   })
-  .then(function(tree) {
-    console.log(tree);
-    return tree;
+  .then(function(sequence){
+    return sequence.map( fragment => fragment.get("text") );
   });
+
+  //// stitching helpers //////////////////////
+  function stitchReduce(fragments, sequence) {
+    if (sequence === undefined) {
+      sequence = [];
+      sequence.push(pluckRandom(fragments));
+    }
+    if (fragments.length === 0) {
+      return sequence;
+    }
+
+    var tree = new FragmentTree(fragments.map((fragment, i) => {
+                                  fragment.attributes._index = i;
+                                  return fragment.attributes;
+                                }));
+
+    var base = sequence[sequence.length - 1];
+    console.log(base);
+    var match = tree.search(base.attributes);
+    sequence.push(pluck(fragments, match._index));
+    return stitchReduce(fragments, sequence);
+  }
+
+  function pluck(array, index) {
+    var len = array.length;
+    var temp = array[index];
+    array[index] = array[len - 1];
+    array[len - 1] = temp;
+    return array.pop();
+  }
+
+  function pluckRandom(array) {
+    if (!array.length) return null;
+    var randomIx = Math.floor(Math.random() * array.length);
+    return pluck(array, randomIx);
+  }
 }
 
 module.exports = {

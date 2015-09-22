@@ -23,7 +23,6 @@ apiRoutes.route("/posts")
       .then(function() {
         res.status(201).end();
       });
-    console.log(req.body);
   });
 
 apiRoutes.route("/fragments")
@@ -35,8 +34,8 @@ apiRoutes.route("/fragments")
 
 apiRoutes.route("/fragments/stitched")
   .get(function(req, res) {
-    db.stitchPosts().then(function(tree) {
-      res.json(tree);
+    db.stitchPosts().then(function(sequence) {
+      res.json(sequence);
     });
   });
 
