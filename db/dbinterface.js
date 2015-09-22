@@ -1,5 +1,6 @@
 var bookshelf = require("./db");
 var uuid = require("node-uuid");
+var _ = require("underscore");
 var FragmentTree = require("../fragmenttree/fragmentTree.js");
 
 var Post = bookshelf.Model.extend({
@@ -23,6 +24,10 @@ function generateFragments(post) {
     var frontsubstr = words.slice(0, 4).map( word => word.toLowerCase() );
     var backsubstr = words.slice(-4).map( word => word.toLowerCase() );
     var trimmed = words.slice((frontsubstr.length), -(backsubstr.length)).join(" ");
+    // If `trimmed` has been consumed entirely by the substrings, we need to find the difference between substrings:
+    if (!trimmed.length) {
+      backsubstr = _.difference(backsubstr, frontsubstr);
+    }
     return {
       frontsubstr: JSON.stringify(frontsubstr),
       backsubstr: JSON.stringify(backsubstr),
@@ -114,7 +119,7 @@ function stitchPosts(posts) {
     }
 
     if (fragments.length === 0) {
-      sequence[sequence.length - 1].set("trimFromNext", 0);
+      sequence[sequence.length - 1].set("matchLen", 0);
       return sequence;
     }
 
@@ -125,7 +130,7 @@ function stitchPosts(posts) {
 
     var base = sequence[sequence.length - 1];
     var match = tree.search(base.attributes);
-    base.set("trimFromNext", match.matchLen);
+    base.set("matchLen", match.matchLen);
     sequence.push(pluck(fragments, match.fragment._index));
     return sequenceFragments(fragments, sequence);
   }
@@ -140,8 +145,9 @@ function stitchPosts(posts) {
       var backSlice = attrs.backsubstr.slice(-(attrs.matchLen)).join(" ");
 
       var fragText = [frontSlice, attrs.trimmed, backSlice].join(" ");
+
       state.text += " " + fragText;
-      state.trimNext = attrs.matchLen;
+      state.trimFromNext = attrs.matchLen;
 
       return state;
     }, {text: "", trimFromNext: 0}).text;
