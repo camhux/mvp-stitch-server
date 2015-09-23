@@ -6,16 +6,16 @@ import App from "./components/App"
 
 var container = document.getElementById("container");
 
-var getTextFromServer = function() {
-  return new Promise(function(resolve, reject) {
-    var request = new XMLHttpRequest();
-    request.open("GET", "http://localhost:1800/api/content");
-    request.onload = function() {
-      resolve(request.response);
-    };
-    request.send();
-  });
-};
+// var getTextFromServer = function() {
+//   return new Promise(function(resolve, reject) {
+//     var request = new XMLHttpRequest();
+//     request.open("GET", "http://localhost:1800/api/content");
+//     request.onload = function() {
+//       resolve(request.response);
+//     };
+//     request.send();
+//   });
+// };
 
 // var getPostFromServer = function(postId) {
 //   return new Promise(function(resolve, reject) {
@@ -27,10 +27,7 @@ var getTextFromServer = function() {
 //   });
 // }
 
-getTextFromServer().then(function(data) {
-  console.log("AJAX successful: ", data);
-  React.render(
-    <App content={ JSON.parse(data) } />,
-    container
-    );
-});
+React.render(
+  <App />,
+  container
+);

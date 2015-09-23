@@ -4,6 +4,7 @@ import Fragment from "./Fragment";
 export default class Tapestry extends Component {
 
   render() {
+    console.log(this.props);
     return (
 
       <div className="tapestry">
