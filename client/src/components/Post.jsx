@@ -1,4 +1,4 @@
-import {Component, PropTypes} from "react";
+import React, {Component, PropTypes} from "react";
 import stringToColor from "../colorHelper";
 
 export default class Post extends Component {

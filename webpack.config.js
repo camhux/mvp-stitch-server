@@ -1,5 +1,5 @@
 module.exports = {
-  entry: __dirname + "/client/src/app.jsx",
+  entry: __dirname + "/client/src/client.jsx",
 
   output: {
     path: __dirname + "/client/build",

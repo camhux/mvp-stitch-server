@@ -1,13 +1,14 @@
-import {Component, PropTypes} from "react";
+import React, {Component, PropTypes} from "react";
+import Fragment from "./Fragment";
 
-class Tapestry extends Component {
+export default class Tapestry extends Component {
 
   render() {
     return (
 
       <div className="tapestry">
 
-        { this.props.content.map( fragment => <Fragment model={ fragment } /> ) }
+        { this.props.content.map( (fragment, i) => <Fragment key={ i } model={ fragment } /> ) }
 
       </div>
 
