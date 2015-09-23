@@ -1,7 +1,5 @@
 import React, {Component} from "react";
 import Tapestry from "./Tapestry";
-import Prompt from "./Prompt";
-import Submit from "./Submit";
 
 export default class App extends Component {
 
